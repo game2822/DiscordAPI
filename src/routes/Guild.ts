@@ -1,26 +1,26 @@
 import { RestManager } from "../rest/RESTManager";
-import { BASE_URL } from "../rest/endpoints";
+import { BASE_URL, GET_ALL_GUILDS, GET_CHANNELS_FOR_GUILD } from "../rest/endpoints";
 
 const manager = new RestManager(BASE_URL);
 
 
-export const GetAllGuilds = async () => {
-    return manager.get<Array<any>>("/users/@me/guilds",
+export const GetAllGuilds = async (token: string) => {
+    return manager.get<Array<any>>(GET_ALL_GUILDS(),
         undefined,
         {
             "Content-Type": "application/json",
-            Authorization:  process.env.DISCORD_TOKEN!,
+            Authorization:  token,
         }
         
     );
 }
 
-export const GetChannelsForGuild = async (guildId: string) => {
-    return manager.get<Array<any>>(`/guilds/${guildId}/channels`,
+export const GetChannelsForGuild = async (guildId: string, token: string) => {
+    return manager.get<Array<any>>(GET_CHANNELS_FOR_GUILD(guildId),
         undefined,
         {
             "Content-Type": "application/json",
-            Authorization:  process.env.DISCORD_TOKEN!,
+            Authorization:  token,
         }
     );
 }

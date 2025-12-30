@@ -110,33 +110,42 @@ async function testEditMessage(ChannelId?: string, MessageId?: string, NewConten
 
 async function AutomatedTests() {
     console.log('\nRunning Automated Test Suite...\n');
-    let MessageId: string = "";
-    let ChannelId: string = "1451555594103292015";
-    try {
-    const result = await testSendMessage(ChannelId, "Automated Test Message");
-    MessageId = result.id;
+    const ChannelId: string = "1446808721832411197";
+    
+    for (let i = 1; i <= 5; i++) {
+        console.log(`\n=== Test Iteration ${i}/5 ===\n`);
+        let MessageId: string = "";
         
-    }catch (e) {
-        console.error('Error in Send Message Test:', e);
+        try {
+            const result = await testSendMessage(ChannelId, `Automated Test Message ${i}`);
+            MessageId = result.id;
+        } catch (e) {
+            console.error('Error in Send Message Test:', e);
+        }
+        console.log('-----------------------------------');
+        
+        try {
+            await testGetMessages(ChannelId);
+        } catch (e) {
+            console.error('Error in Get Messages Test:', e);
+        }
+        console.log('-----------------------------------');
+        
+        try {
+            await testEditMessage(ChannelId, MessageId, `Edited Automated Test Message ${i}`);
+        } catch (e) {
+            console.error('Error in Edit Message Test:', e);
+        }
+        console.log('-----------------------------------');
+        
+        try {
+            await testDeleteMessage(ChannelId, MessageId);
+        } catch (e) {
+            console.error('Error in Delete Message Test:', e);
+        }
+        console.log('-----------------------------------');
     }
-    console.log('-----------------------------------');
-    try {
-    await testGetMessages(ChannelId);
-    }catch (e) {
-        console.error('Error in Get Messages Test:', e);
-    }
-    console.log('-----------------------------------');
-    try {
-    await testEditMessage(ChannelId, MessageId, "Edited Automated Test Message");
-    }catch (e) {
-        console.error('Error in Edit Message Test:', e);
-    }
-    console.log('-----------------------------------');
-    try {
-    await testDeleteMessage(ChannelId, MessageId);
-    }catch (e) {
-        console.error('Error in Delete Message Test:', e);
-    }
+    
     console.log('\nAutomated Test Suite Completed.\n');
     console.log('-----------------------------------');
 }

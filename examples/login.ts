@@ -1,4 +1,4 @@
-import { DiscordAPI } from "../src/structures/DiscordAPI";
+import { Login } from "../src/util/Login";
 import * as readline from "readline";
 
 const rl = readline.createInterface({
@@ -6,7 +6,6 @@ const rl = readline.createInterface({
     output: process.stdout
 });
 
-const api = new DiscordAPI("", "");
 
 (async () => {
     const email = await new Promise<string>((resolve) => {
@@ -19,6 +18,10 @@ const api = new DiscordAPI("", "");
             resolve(answer);
         });
     });
-    await api.login(email, password);
+    const response = await Login(email, password);
+
+    console.log("Login successful!");
+    console.log("Token:", response.Token);
+    console.log("User ID:", response.userId);
     rl.close();
 })();

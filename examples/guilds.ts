@@ -108,7 +108,7 @@ async function AutomatedTests() {
     let GuildId: string = "1452784950708404476";
     try {
     const result = await testGetAllGuilds();
-    GuildId = result ? JSON.parse(result)[result.length - 1].id : GuildId;
+    GuildId = result && Array.isArray(result) && result.length > 0 ? result[result.length - 1].id : GuildId;
         
     }catch (e) {
         console.error('Error in Get All Guilds Test:', e);
