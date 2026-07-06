@@ -17,6 +17,8 @@ function question(prompt: string): Promise<string> {
     });
 }
 
+"https://cdn.discordapp.com/icons/1452784950708404476/dc225bae9c42d47552735c910809e52d.webp?size=100&quality=lossless"
+
 async function main() {
     console.log('\n=== Discord API Message Tester ===\n');
     console.log('Available functions:');
@@ -54,7 +56,7 @@ async function main() {
 
 async function testGetAllGuilds() {
     try {
-        const result = await GetAllGuilds();
+        const result = await GetAllGuilds(process.env.DISCORD_TOKEN!);
         console.log('\n✓ Guilds retrieved successfully!');
         console.log('Response:', JSON.stringify(result, null, 2));
         return result;
@@ -67,7 +69,7 @@ async function testGetChannelsForGuild(GuildId?: string) {
     const guildId = GuildId ?? await question('Enter guild ID: ');
 
     try {
-        const result = await GetChannelsForGuild(guildId);
+        const result = await GetChannelsForGuild(guildId, process.env.DISCORD_TOKEN!);
         console.log('\n✓ Channels retrieved successfully!');
         console.log('Response:', JSON.stringify(result, null, 2));
     } catch (error) {

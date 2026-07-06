@@ -26,6 +26,6 @@ export const LoginWithout2FA = async (email: string, password: string, fingerpri
     };
     const response = await manager.post<any>(LOGIN_WITHOUT_2FA(), body, undefined, {
         headers: headers,
-        }, true);
+        });
     return response;
 }

@@ -1,6 +1,6 @@
 {
   "name": "@game28/discordapi",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "A wrapper around Discord internal API",
   "repository": {
     "type": "git",

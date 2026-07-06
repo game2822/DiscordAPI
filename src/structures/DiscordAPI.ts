@@ -2,10 +2,13 @@ import { GetFingerprint, LoginWithout2FA } from "../routes/Auth";
 import { GetAllGuilds } from "../routes/Guild";
 
 export class DiscordAPI {
-    constructor(
-        public Token: string,
-        public userId: string,
-    ){}
+    public Token: string;
+    public userId: string;
+
+    constructor(token?: string, userId?: string) {
+        this.Token = token || '';
+        this.userId = userId || '';
+    }
 
     async login(email: string, password: string) {
         try {

@@ -10,9 +10,6 @@ export async function Login(email: string, password: string): Promise<DiscordAPI
     fingerprint.cookies
   );
   
-  // Debug: Log the response to see its structure
-  console.log("Login Response:", JSON.stringify(loginResponse, null, 2));
-  
   // Create and return a DiscordAPI instance with the token and user ID
   return new DiscordAPI(loginResponse.token, loginResponse.user_id);
 }

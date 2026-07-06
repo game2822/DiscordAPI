@@ -8,19 +8,12 @@ const rl = readline.createInterface({
 
 
 (async () => {
-    const email = await new Promise<string>((resolve) => {
-        rl.question("Enter your email: ", (answer) => {
-            resolve(answer);
-        });
-    });
-    const password = await new Promise<string>((resolve) => {
-        rl.question("Enter your password: ", (answer) => {
-            resolve(answer);
-        });
-    });
+    const email = "oreolive311@gmail.com"
+    const password = "yiJq4SaYA$ag#35"
     const response = await Login(email, password);
 
     console.log("Login successful!");
+    console.log("JSON Response:", response);
     console.log("Token:", response.Token);
     console.log("User ID:", response.userId);
     rl.close();
