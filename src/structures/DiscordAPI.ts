@@ -1,29 +1,35 @@
-import { GetFingerprint, LoginWithout2FA } from "../routes/Auth";
-import { GetAllGuilds } from "../routes/Guild";
+import type { LoginOptions, LoginResponse } from "../routes/Auth";
+import { LoginWithPassword } from "../routes/Auth";
+import { GetCurrentUser } from "../routes/User";
 
 export class DiscordAPI {
     public Token: string;
     public userId: string;
 
-    constructor(token?: string, userId?: string) {
-        this.Token = token || '';
-        this.userId = userId || '';
+    constructor(token = "", userId = "") {
+        this.Token = token;
+        this.userId = userId;
     }
 
-    async login(email: string, password: string) {
-        try {
-        const {fingerprint, cookies} =  await GetFingerprint();
-        const loginResponse = await LoginWithout2FA(email, password, fingerprint, cookies);
-        this.Token = loginResponse.token;
-        this.userId = loginResponse.user_id;
-    } catch (error) {
-        console.error("Error during authentication:", error);
-    }
+    public async login(email: string, password: string, options: LoginOptions = {}): Promise<this> {
+        this.applyLogin(await LoginWithPassword(email, password, options));
+        return this;
     }
 
-     async GetGrades(): Promise<Array<any>> {
-        return GetAllGuilds(this.Token);
+    public async loginWithToken(token: string): Promise<this> {
+        const user = await GetCurrentUser(token);
+        this.Token = token;
+        this.userId = user.id;
+        return this;
     }
-    
-    
+
+    public isLoggedIn(): boolean {
+        return this.Token.length > 0;
+    }
+
+    private applyLogin(response: LoginResponse): void {
+        if (!response.token) throw new Error("Login response did not contain a token.");
+        this.Token = response.token;
+        this.userId = response.user_id ?? "";
+    }
 }

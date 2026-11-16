@@ -6,7 +6,7 @@
     "lib": ["ES2022"],
     "inlineSourceMap": false,
     "sourceMap": true,
-    "importHelpers": true,
+    "importHelpers": false,
     "newLine": "LF",
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,

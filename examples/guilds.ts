@@ -1,128 +1,36 @@
-import dotenv from 'dotenv';
-import * as readline from 'readline';
-import { GetAllGuilds, GetChannelsForGuild } from '../src/routes/Guild';
+import { configDotenv } from "dotenv";
+import { GetCurrentUserGuilds } from "../src";
+import { promptHidden } from "./prompt";
 
-dotenv.config();
+async function main(): Promise<void> {
+    console.log("Discord guilds");
+    console.log("Lists guilds for the authenticated user.\n");
+    configDotenv();
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
+    const token = (process.env.DISCORD_TOKEN ?? await promptHidden("Token: ")).trim();
+    if (!token) throw new Error("A token is required.");
+
+    const guilds = await GetCurrentUserGuilds(token, { limit: 100, withCounts: true });
+
+    console.log(`\n${guilds.length} guild(s):`);
+    for (const guild of guilds) {
+        console.log("---------------------------------------------------------");
+        console.log(`Name: ${guild.name}`);
+        console.log(`Icon: ${guild.icon}`);
+        console.log(`Banner: ${guild.banner}`);
+        console.log(`Owner: ${guild.owner}`);
+        console.log(`Perms: ${guild.permissions}`);
+        console.log(`Features: ${guild.features}`);
+        console.log(`Members: ${guild.approximate_member_count}`);
+        console.log(`Online: ${guild.approximate_presence_count}`);
+    }
+}
+
+main().catch((error: unknown) => {
+    if (error instanceof Error) {
+        console.error(`\nFailed to list guilds: ${error.message}`);
+    } else {
+        console.error("\nFailed to list guilds with an unknown error.");
+    }
+    process.exitCode = 1;
 });
-
-function question(prompt: string): Promise<string> {
-    return new Promise((resolve) => {
-        rl.question(prompt, (answer) => {
-            resolve(answer);
-        });
-    });
-}
-
-"https://cdn.discordapp.com/icons/1452784950708404476/dc225bae9c42d47552735c910809e52d.webp?size=100&quality=lossless"
-
-async function main() {
-    console.log('\n=== Discord API Message Tester ===\n');
-    console.log('Available functions:');
-    console.log('1. Get All Guilds');
-    console.log('2. Get Channels for Guild');
-    console.log('5. Automated Test Suite\n');
-
-    const choice = await question('Select a function (1-5): ');
-
-    switch (choice) {
-        case '1':
-            await testGetAllGuilds();
-            break;
-        case '2':
-            await testGetChannelsForGuild();
-            break;
-        case '3':
-            await testGetMessages();
-            break;
-        case '4':
-            await testEditMessage();
-            break;
-        case '5':
-            console.log('\nRunning Automated Test Suite...\n');
-            await AutomatedTests();
-            console.log('\nAutomated Test Suite Completed.\n');
-            break;
-        default:
-            console.log('Invalid choice!');
-            break;
-    }
-
-    rl.close();
-}
-
-async function testGetAllGuilds() {
-    try {
-        const result = await GetAllGuilds(process.env.DISCORD_TOKEN!);
-        console.log('\n✓ Guilds retrieved successfully!');
-        console.log('Response:', JSON.stringify(result, null, 2));
-        return result;
-    } catch (error) {
-        console.error('\n✗ Error retrieving guilds:', error);
-    }
-}
-
-async function testGetChannelsForGuild(GuildId?: string) {
-    const guildId = GuildId ?? await question('Enter guild ID: ');
-
-    try {
-        const result = await GetChannelsForGuild(guildId, process.env.DISCORD_TOKEN!);
-        console.log('\n✓ Channels retrieved successfully!');
-        console.log('Response:', JSON.stringify(result, null, 2));
-    } catch (error) {
-        console.error('\n✗ Error retrieving channels:', error);
-    }
-
-}
-
-async function testGetMessages(ChannelId?: string) {
-    const channelId = ChannelId ?? await question('Enter channel ID: ');
-
-    try {
-        //const messages = await GetMessagesForChannel(channelId, process.env.DISCORD_TOKEN!);
-        console.log('\n✓ Messages retrieved successfully!');
-       // console.log(`Found ${messages.length} messages:`);
-        //console.log(JSON.stringify(messages, null, 2));
-    } catch (error) {
-        console.error('\n✗ Error getting messages:', error);
-    }
-}
-
-async function testEditMessage(ChannelId?: string, MessageId?: string, NewContent?: string) {
-    const channelId = ChannelId ?? await question('Enter channel ID: ');
-    const messageId = MessageId ?? await question('Enter message ID: ');
-    const newContent = NewContent ?? await question('Enter new message content: ');
-    try {
-        // Assuming EditMessageInChannel is implemented similarly to SendMessageInChannel
-        //const result = await EditMessageInChannel(channelId, messageId, newContent, process.env.DISCORD_TOKEN!);
-        console.log('\n✓ Message edited successfully!');
-       // console.log('Response:', JSON.stringify(result, null, 2));
-    } catch (error) {
-        console.error('\n✗ Error editing message:', error);
-    }
-}
-
-async function AutomatedTests() {
-    console.log('\nRunning Automated Test Suite...\n');
-    let GuildId: string = "1452784950708404476";
-    try {
-    const result = await testGetAllGuilds();
-    GuildId = result && Array.isArray(result) && result.length > 0 ? result[result.length - 1].id : GuildId;
-        
-    }catch (e) {
-        console.error('Error in Get All Guilds Test:', e);
-    }
-    console.log('-----------------------------------');
-    try {
-    await testGetChannelsForGuild(GuildId);
-    }catch (e) {
-        console.error('Error in Get Channels for Guild Test:', e);
-    }
-    console.log('\nAutomated Test Suite Completed.\n');
-    console.log('-----------------------------------');
-}
-
-main();

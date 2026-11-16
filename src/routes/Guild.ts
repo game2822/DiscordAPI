@@ -1,26 +1,37 @@
 import { RestManager } from "../rest/RESTManager";
-import { BASE_URL, GET_ALL_GUILDS, GET_CHANNELS_FOR_GUILD } from "../rest/endpoints";
+import { BASE_URL, GET_CURRENT_USER_GUILDS } from "../rest/endpoints";
+import { Guild } from "../structures/Guild";
 
-const manager = new RestManager(BASE_URL);
-
-
-export const GetAllGuilds = async (token: string) => {
-    return manager.get<Array<any>>(GET_ALL_GUILDS(),
-        undefined,
-        {
-            "Content-Type": "application/json",
-            Authorization:  token,
-        }
-        
-    );
+export interface GetCurrentUserGuildsOptions {
+    before?: string;
+    after?: string;
+    limit?: number;
+    withCounts?: boolean;
 }
 
-export const GetChannelsForGuild = async (guildId: string, token: string) => {
-    return manager.get<Array<any>>(GET_CHANNELS_FOR_GUILD(guildId),
-        undefined,
-        {
-            "Content-Type": "application/json",
-            Authorization:  token,
-        }
-    );
+export async function GetCurrentUserGuilds(
+    token: string,
+    options: GetCurrentUserGuildsOptions = {},
+): Promise<Guild[]> {
+    const manager = new RestManager(BASE_URL);
+    const response = await manager.get<Array<Record<string, unknown>>>(GET_CURRENT_USER_GUILDS(), {
+        before: options.before,
+        after: options.after,
+        limit: options.limit,
+        with_counts: options.withCounts,
+    }, {
+        Authorization: token,
+    });
+
+    return response.map((item) => new Guild(
+        String(item.id),
+        String(item.name),
+        (item.icon as string | null | undefined) ?? null,
+        (item.banner as string | null | undefined) ?? null,
+        Boolean(item.owner),
+        typeof item.permissions === "string" ? item.permissions : undefined,
+        Array.isArray(item.features) ? item.features.map(String) : [],
+        typeof item.approximate_member_count === "number" ? item.approximate_member_count : undefined,
+        typeof item.approximate_presence_count === "number" ? item.approximate_presence_count : undefined,
+    ));
 }
